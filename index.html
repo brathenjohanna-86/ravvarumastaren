@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Råvarumästaren</title>
 
 <style>
@@ -20,7 +19,7 @@ body{
     background:white;
     padding:20px;
     border-radius:20px;
-    box-shadow:0 4px 10px rgba(0,0,0,.15);
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
 
 h1{
@@ -28,25 +27,10 @@ h1{
     color:#2563eb;
 }
 
-.progress{
-    width:100%;
-    height:20px;
-    background:#dbeafe;
-    border-radius:20px;
-    overflow:hidden;
-    margin-bottom:20px;
-}
-
-.progress-fill{
-    height:100%;
-    width:0%;
-    background:#22c55e;
-    transition:.3s;
-}
-
-.symbol{
+.score{
     text-align:center;
-    font-size:72px;
+    font-size:20px;
+    margin-bottom:15px;
 }
 
 .question{
@@ -56,13 +40,19 @@ h1{
     margin:20px 0;
 }
 
+.symbol{
+    font-size:70px;
+    text-align:center;
+}
+
 button{
     width:100%;
     min-height:60px;
+    margin:8px 0;
     border:none;
     border-radius:15px;
-    margin:8px 0;
     font-size:20px;
+    cursor:pointer;
 }
 
 .answer{
@@ -88,22 +78,9 @@ button{
 
 #feedback{
     text-align:center;
-    font-size:22px;
+    font-size:20px;
     margin-top:15px;
     min-height:80px;
-}
-
-.memory{
-    background:#ecfdf5;
-    margin-top:10px;
-    padding:10px;
-    border-radius:10px;
-}
-
-.score{
-    text-align:center;
-    font-size:20px;
-    margin-bottom:10px;
 }
 </style>
 </head>
@@ -117,31 +94,172 @@ button{
 Poäng: <span id="score">0</span>
 </div>
 
-<div class="progress">
-<div class="progress-fill" id="progress"></div>
-</div>
-
 <div class="symbol" id="symbol"></div>
 
 <div class="question" id="question"></div>
 
-<button id="speakBtn">🔊 Läs upp frågan</button>
+<button id="speakBtn">
+🔊 Läs upp frågan
+</button>
 
 <div id="answers"></div>
 
 <div id="feedback"></div>
 
-<button id="nextBtn">Nästa fråga</button>
+<button id="nextBtn">
+Nästa fråga
+</button>
 
 </div>
 
 <script>
 
 const questions = [
-
 {
 symbol:"🌳",
 question:"Vad är en råvara?",
-answers:["En färdig produkt","Något från naturen","Ett batteri"],
-correct:1,
-hint:"Trä är en råvara från naturen.",
+answers:[
+"En färdig produkt",
+"Något från naturen",
+"Ett batteri"
+],
+correct:1
+},
+{
+symbol:"♻️",
+question:"Vad betyder återanvändning?",
+answers:[
+"Använda igen",
+"Kasta",
+"Bränna upp"
+],
+correct:0
+},
+{
+symbol:"🔋",
+question:"Vilken metall används i batterier?",
+answers:[
+"Litium",
+"Papper",
+"Cellulosa"
+],
+correct:0
+}
+];
+
+let current = 0;
+let points = 0;
+
+const symbolEl = document.getElementById("symbol");
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const feedbackEl = document.getElementById("feedback");
+const scoreEl = document.getElementById("score");
+const nextBtn = document.getElementById("nextBtn");
+
+function speak(text){
+
+  if("speechSynthesis" in window){
+
+    speechSynthesis.cancel();
+
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = "sv-SE";
+
+    speechSynthesis.speak(msg);
+  }
+}
+
+document.getElementById("speakBtn")
+.addEventListener("click", function(){
+
+  speak(
+    questions[current].question
+  );
+
+});
+
+function loadQuestion(){
+
+  const q = questions[current];
+
+  symbolEl.textContent = q.symbol;
+  questionEl.textContent = q.question;
+
+  answersEl.innerHTML = "";
+  feedbackEl.innerHTML = "";
+
+  nextBtn.style.display = "none";
+
+  q.answers.forEach(function(answer,index){
+
+    const btn =
+      document.createElement("button");
+
+    btn.className = "answer";
+    btn.textContent = answer;
+
+    btn.onclick = function(){
+
+      if(index === q.correct){
+
+        feedbackEl.innerHTML =
+          "✅ Rätt!";
+
+        points++;
+        scoreEl.textContent = points;
+
+        document
+        .querySelectorAll(".answer")
+        .forEach(function(b){
+          b.disabled = true;
+        });
+
+        nextBtn.style.display =
+          "block";
+
+      } else {
+
+        btn.disabled = true;
+
+        feedbackEl.innerHTML =
+          "💡 Försök igen!";
+
+      }
+
+    };
+
+    answersEl.appendChild(btn);
+
+  });
+
+}
+
+nextBtn.addEventListener("click", function(){
+
+  current++;
+
+  if(current >= questions.length){
+
+    document.querySelector(".card")
+    .innerHTML = `
+      <h1>🏆 Du klarade det!</h1>
+      <p>Poäng: ${points}</p>
+      <button onclick="location.reload()">
+      Spela igen
+      </button>
+    `;
+
+    return;
+  }
+
+  loadQuestion();
+
+});
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
