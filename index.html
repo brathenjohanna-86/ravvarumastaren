@@ -1,190 +1,450 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏆 Råvarumästaren</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#eef6ff;
+    margin:0;
+    padding:15px;
+}
+
+.card{
+    max-width:600px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+h1{
+    text-align:center;
+    color:#2563eb;
+}
+
+.score{
+    text-align:center;
+    font-size:20px;
+    margin-bottom:15px;
+}
+
+.progress{
+    width:100%;
+    height:18px;
+    background:#dbeafe;
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:#22c55e;
+    transition:.3s;
+}
+
+.symbol{
+    text-align:center;
+    font-size:80px;
+}
+
+.question{
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+    margin:20px 0;
+}
+
+button{
+    width:100%;
+    min-height:60px;
+    border:none;
+    border-radius:15px;
+    margin:8px 0;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.answer{
+    background:#3b82f6;
+    color:white;
+}
+
+.answer:disabled{
+    background:#cbd5e1;
+    color:#555;
+}
+
+#speakBtn{
+    background:#f59e0b;
+    color:white;
+}
+
+#nextBtn{
+    background:#22c55e;
+    color:white;
+    display:none;
+}
+
+#feedback{
+    text-align:center;
+    font-size:20px;
+    margin-top:15px;
+    min-height:120px;
+}
+
+.memory{
+    background:#ecfdf5;
+    border-radius:12px;
+    padding:10px;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>🏆 Råvarumästaren</h1>
+
+<div class="score">
+Poäng: <span id="score">0</span>
+</div>
+
+<div class="progress">
+<div id="progress" class="progress-fill"></div>
+</div>
+
+<div id="symbol" class="symbol"></div>
+
+<div id="question" class="question"></div>
+
+<button id="speakBtn">
+🔊 Läs upp frågan
+</button>
+
+<div id="answers"></div>
+
+<div id="feedback"></div>
+
+<button id="nextBtn">
+Nästa fråga ➜
+</button>
+
+</div>
+
+<script>
+
 const questions = [
 
 {
 symbol:"🌳",
 question:"Vad är en råvara?",
-answers:[
-"En färdig produkt",
-"Något från naturen",
-"Ett batteri"
-],
-correct:1
+answers:["En färdig produkt","Något från naturen","Ett batteri"],
+correct:1,
+fact:"🌳 Råvaror kommer från naturen."
 },
 
 {
 symbol:"♻️",
 question:"Vad betyder återanvändning?",
-answers:[
-"Använda igen",
-"Kasta",
-"Bränna upp"
-],
-correct:0
+answers:["Använda igen","Kasta","Bränna upp"],
+correct:0,
+fact:"♻️ Samma sak används igen."
 },
 
 {
 symbol:"♻️🥫",
 question:"Vad är återvinning?",
-answers:[
-"Använda samma sak igen",
-"Göra nytt av material",
-"Köpa nytt"
-],
-correct:1
+answers:["Använda igen","Göra nytt av material","Kasta"],
+correct:1,
+fact:"🥫 Gamla material blir nya produkter."
 },
 
 {
 symbol:"⛰️",
 question:"Vad är malm?",
-answers:[
-"Berg med metall",
-"Ett träd",
-"En plast"
-],
-correct:0
+answers:["Berg med metall","En plast","Ett träd"],
+correct:0,
+fact:"⛰️ Malm innehåller värdefulla metaller."
 },
 
 {
 symbol:"🔩",
 question:"Vilket är en metall?",
-answers:[
-"Järn",
-"Papper",
-"Bomull"
-],
-correct:0
+answers:["Järn","Papper","Bomull"],
+correct:0,
+fact:"🔩 Järn är en metall."
 },
 
 {
 symbol:"⛏️",
 question:"Järnmalm innehåller...",
-answers:[
-"Järn",
-"Papper",
-"Vatten"
-],
-correct:0
+answers:["Järn","Vatten","Papper"],
+correct:0,
+fact:"⛏️ Från järnmalm får man järn."
 },
 
 {
 symbol:"🚲",
 question:"Stål används bland annat i...",
-answers:[
-"Cyklar",
-"Mjölk",
-"Äpplen"
-],
-correct:0
+answers:["Cyklar","Äpplen","Mjölk"],
+correct:0,
+fact:"🚲 Många cyklar innehåller stål."
 },
 
 {
 symbol:"🔋",
 question:"Vilken metall används i batterier?",
-answers:[
-"Litium",
-"Papper",
-"Cellulosa"
-],
-correct:0
+answers:["Litium","Cellulosa","Papper"],
+correct:0,
+fact:"🔋 Litium används i batterier."
 },
 
 {
 symbol:"🔋🚗",
 question:"Vilken metall används också i batterier?",
-answers:[
-"Kobolt",
-"PET",
-"PLA"
-],
-correct:0
-},
-
-{
-symbol:"🌳📄",
-question:"Vad används för att göra papper?",
-answers:[
-"Pappersmassa",
-"Kobolt",
-"Naturgas"
-],
-correct:0
-},
-
-{
-symbol:"👕",
-question:"Polyester är...",
-answers:[
-"En syntetisk fiber",
-"En metall",
-"En växt"
-],
-correct:0
-},
-
-{
-symbol:"🛢️",
-question:"Råolja är en...",
-answers:[
-"Fossil råvara",
-"Metall",
-"Växtfiber"
-],
-correct:0
-},
-
-{
-symbol:"🔥",
-question:"Naturgas består främst av...",
-answers:[
-"Metan",
-"Järn",
-"Cellulosa"
-],
-correct:0
-},
-
-{
-symbol:"🥤",
-question:"PET används ofta i...",
-answers:[
-"Läskflaskor",
-"Husgrunder",
-"Träd"
-],
-correct:0
-},
-
-{
-symbol:"🌽",
-question:"PLA kan tillverkas av...",
-answers:[
-"Växter",
-"Järnmalm",
-"Kobolt"
-],
-correct:0
+answers:["Kobolt","PET","PLA"],
+correct:0,
+fact:"🔋 Kobolt används i vissa batterier."
 },
 
 {
 symbol:"🌱",
 question:"Vad är växtfiber?",
-answers:[
-"Fiber från växter",
-"En metall",
-"En plast"
-],
-correct:0
+answers:["Fiber från växter","Metall","Plast"],
+correct:0,
+fact:"🌱 Bomull är en växtfiber."
 },
 
 {
 symbol:"🌳",
 question:"Cellulosa finns i...",
-answers:[
-"Träd och växter",
-"Batterier",
-"Cyklar"
-],
-correct:0
+answers:["Träd och växter","Batterier","Stål"],
+correct:0,
+fact:"🌳 Träd innehåller mycket cellulosa."
+},
+
+{
+symbol:"📄",
+question:"Vad används för att göra papper?",
+answers:["Pappersmassa","Kobolt","Naturgas"],
+correct:0,
+fact:"📄 Papper görs av pappersmassa."
+},
+
+{
+symbol:"👕",
+question:"Polyester är...",
+answers:["Syntetisk fiber","Metall","Växt"],
+correct:0,
+fact:"👕 Polyester används i många kläder."
+},
+
+{
+symbol:"🧶",
+question:"Akryl liknar ofta...",
+answers:["Ull","Stål","Trä"],
+correct:0,
+fact:"🧶 Akryl är en syntetisk fiber."
+},
+
+{
+symbol:"🛢️",
+question:"Råolja är en...",
+answers:["Fossil råvara","Metall","Växtfiber"],
+correct:0,
+fact:"🛢️ Råolja används bland annat till plast."
+},
+
+{
+symbol:"🔥",
+question:"Naturgas består främst av...",
+answers:["Metan","Järn","Cellulosa"],
+correct:0,
+fact:"🔥 Naturgas består främst av metan."
+},
+
+{
+symbol:"🥤",
+question:"PET används ofta i...",
+answers:["Läskflaskor","Cykelhjälmar","Träd"],
+correct:0,
+fact:"🥤 PET används i plastflaskor."
 }
 
 ];
+
+let current = 0;
+let points = 0;
+
+const symbolEl = document.getElementById("symbol");
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const feedbackEl = document.getElementById("feedback");
+const scoreEl = document.getElementById("score");
+const progressEl = document.getElementById("progress");
+const nextBtn = document.getElementById("nextBtn");
+
+function speak(text){
+
+if("speechSynthesis" in window){
+
+speechSynthesis.cancel();
+
+const msg =
+new SpeechSynthesisUtterance(text);
+
+msg.lang = "sv-SE";
+msg.rate = 0.9;
+
+speechSynthesis.speak(msg);
+
+}
+
+}
+
+function updateProgress(){
+
+progressEl.style.width =
+(current/questions.length)*100 + "%";
+
+}
+
+function loadQuestion(){
+
+updateProgress();
+
+const q = questions[current];
+
+symbolEl.textContent = q.symbol;
+questionEl.textContent = q.question;
+
+answersEl.innerHTML = "";
+feedbackEl.innerHTML = "";
+
+nextBtn.style.display = "none";
+
+q.answers.forEach((answer,index)=>{
+
+const btn =
+document.createElement("button");
+
+btn.className = "answer";
+btn.textContent = answer;
+
+btn.onclick = () => checkAnswer(index,btn);
+
+answersEl.appendChild(btn);
+
+});
+
+setTimeout(()=>{
+speak(q.question);
+},500);
+
+}
+
+function checkAnswer(index,button){
+
+const q = questions[current];
+
+if(index === q.correct){
+
+const correctAnswer =
+q.answers[q.correct];
+
+feedbackEl.innerHTML = `
+✅ Rätt!
+
+<div class="memory">
+<strong>Rätt svar:</strong><br>
+${correctAnswer}
+<br><br>
+${q.fact}
+</div>
+`;
+
+points++;
+scoreEl.textContent = points;
+
+document
+.querySelectorAll(".answer")
+.forEach(btn => btn.disabled = true);
+
+nextBtn.style.display = "block";
+
+speak("Rätt. " + correctAnswer);
+
+}else{
+
+button.disabled = true;
+
+feedbackEl.innerHTML = `
+💡 Försök igen!
+
+<div class="memory">
+${q.fact}
+</div>
+`;
+
+speak("Försök igen");
+}
+
+}
+
+document
+.getElementById("speakBtn")
+.addEventListener("click",()=>{
+
+speak(questions[current].question);
+
+});
+
+nextBtn.onclick = ()=>{
+
+current++;
+
+if(current >= questions.length){
+
+document.querySelector(".card").innerHTML = `
+<h1>🏆 Du klarade spelet!</h1>
+
+<h2>${points} av ${questions.length} poäng</h2>
+
+<p>🌳 Råvara = från naturen</p>
+<p>♻️ Återanvändning = använda igen</p>
+<p>♻️ Återvinning = göra nytt av material</p>
+<p>⛏️ Järnmalm innehåller järn</p>
+<p>🔋 Litium och kobolt används i batterier</p>
+<p>📄 Pappersmassa blir papper</p>
+<p>🛢️ Råolja används till plast</p>
+<p>🥤 PET används i flaskor</p>
+
+<button onclick="location.reload()">
+Spela igen
+</button>
+`;
+
+speak("Grattis. Du klarade hela spelet.");
+
+return;
+}
+
+loadQuestion();
+
+};
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
